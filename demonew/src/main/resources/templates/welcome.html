@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Medium Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                document.getElementById('logoutForm').submit();
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles to refine the Medium-like layout */
+        .border-b-gray-200 {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .medium-logo {
+            font-family: 'Playfair Display', serif; /* A classic serif font similar to Medium's logo */
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .medium-gray-text {
+            color: #666;
+        }
+        .medium-orange {
+            color: #ffc017; /* Medium's signature orange/yellow */
+        }
+        .medium-dark-green {
+            color: #03a87c; /* Medium's dark green for some links/icons */
+        }
+        .hover-underline:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-900 bg-white">
+    <!-- Header/Navigation Bar -->
+    <header class="border-b border-gray-200 py-4">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="medium-logo text-gray-900">Medium</a>
+                <form action="/welcome" method="get" class="hidden md:flex items-center space-x-4 border px-3 py-1 rounded-full bg-gray-100 text-gray-500">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           name="search" 
+                           th:value="${searchQuery}" 
+                           placeholder="Search" 
+                           class="bg-transparent outline-none text-gray-900 placeholder-gray-500" 
+                    />
+                </form>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="/new-story" class="text-gray-600 hover:text-gray-900 medium-gray-text">Write</a>
+                <a href="#" class="text-gray-600 hover:text-gray-900 medium-gray-text">Notifications</a>
+                <div class="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold">Y</div>
+                <form th:action="@{/logout}" method="post" class="inline-block" id="logoutForm">
+                    <button type="button" onclick="confirmLogout()" class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700 transition duration-200 flex items-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secondary Navigation (For you, Following, etc.) -->
+    <nav class="border-b border-gray-200 py-3">
+        <div class="max-w-7xl mx-auto px-4 flex items-center space-x-6 text-sm medium-gray-text">
+            <a href="#" class="font-semibold text-gray-900 border-b-2 border-gray-900 pb-2">For you</a>
+            <a href="#" id="following-link" class="hover:text-gray-900">Following</a>
+            <a href="#" class="hover:text-gray-900">Featured</a>
+            <!-- Topics will be dynamically loaded here -->
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row lg:space-x-8">
+        <!-- Articles Section (Dynamic Content) -->
+        <section class="lg:w-2/3 space-y-10">
+            <!-- Search Results Message -->
+            <div th:if="${searchQuery != null}" class="mb-4">
+                <p class="text-gray-600">
+                    <span th:if="${articles.empty}">No articles found for "</span>
+                    <span th:unless="${articles.empty}">Showing results for "</span>
+                    <span th:text="${searchQuery}" class="font-semibold"></span>"
+                </p>
+            </div>
+
+            <!-- Articles List -->
+            <article th:each="article : ${articles}" class="flex items-center space-x-6 group">
+                <div class="flex-1">
+                    <div class="flex items-center text-sm medium-gray-text mb-2">
+                        <img th:src="${article.get('user').get('profile_image')}" alt="Author profile" class="w-5 h-5 rounded-full mr-2"/>
+                        <span th:text="${article.get('user').get('name')}">Author Name</span>
+                        <span th:if="${article.get('organization') != null}" th:text="' in ' + ${article.get('organization').get('name')}"></span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 group-hover:underline"><a th:href="${article.get('url')}" th:text="${article.get('title')}">Article Title</a></h3>
+                    <p class="text-gray-700 medium-gray-text mb-3" th:text="${article.get('description')}">Article Description</p>
+                    <div class="flex items-center text-sm medium-gray-text space-x-3">
+                        <span class="medium-orange">&#9733;</span>
+                        <span th:text="${article.get('published_at') != null ? article.get('published_at') : 'N/A'}">Mar 15</span>
+                        <span>&#x2022; <span th:text="${article.get('public_reactions_count') != null ? article.get('public_reactions_count') : '0'}">0</span> Reactions</span>
+                        <span>&#x2022; <span th:text="${article.get('comments_count') != null ? article.get('comments_count') : '0'}">0</span> Comments</span>
+                    </div>
+                </div>
+                <div th:if="${article.get('cover_image') != null}" class="w-32 h-32 flex-shrink-0 bg-gray-300 rounded-lg overflow-hidden">
+                    <img th:src="${article.get('cover_image')}" alt="Article cover" class="w-full h-full object-cover" />
+                </div>
+                <div th:unless="${article.get('cover_image') != null}" class="w-32 h-32 flex-shrink-0 bg-gray-300 rounded-lg flex items-center justify-center text-gray-500">
+                    No Image
+                </div>
+            </article>
+
+            <!-- More articles will be dynamically loaded here -->
+        </section>
+
+        <!-- Sidebar Section (Static for now, can be made dynamic later) -->
+        <aside class="lg:w-1/3 lg:pl-8 lg:border-l lg:border-gray-200 mt-10 lg:mt-0">
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold mb-4">Staff Picks</h4>
+                <ul class="space-y-4">
+                    <li>
+                        <p class="text-sm font-semibold mb-1">Colin Myers</p>
+                        <a href="#" class="text-md font-bold hover-underline">Are You Closer to Podcasters Than Your Friends?</a>
+                        <p class="text-xs medium-gray-text mt-1">Jun 3</p>
+                    </li>
+                    <li>
+                        <p class="text-sm font-semibold mb-1">In Prism & Pen by Giulio Serafini</p>
+                        <a href="#" class="text-md font-bold hover-underline">Struggling To Make Up My Mind on the Over-Commercialization of Pride</a>
+                        <p class="text-xs medium-gray-text mt-1">4d ago</p>
+                    </li>
+                    <li>
+                        <p class="text-sm font-semibold mb-1">In Just Start Writing by Scott Lamb</p>
+                        <a href="#" class="text-md font-bold hover-underline">Want to just start writing? Join the "Write with Medium" June micro-challenge</a>
+                        <p class="text-xs medium-gray-text mt-1">Jun 3</p>
+                    </li>
+                </ul>
+                <a href="#" class="text-green-600 medium-dark-green text-sm mt-4 inline-block hover-underline">See the full list</a>
+            </div>
+
+            <div class="p-6 rounded-lg bg-blue-50 border border-blue-200">
+                <h4 class="text-lg font-bold mb-3">Writing on Medium</h4>
+                <ul class="space-y-2 text-sm medium-gray-text">
+                    <li><a href="#" class="hover-underline">New writer FAQ</a></li>
+                    <li><a href="#" class="hover-underline">Expert writing advice</a></li>
+                    <li><a href="#" class="hover-underline">Grow your audience</a></li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Include Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script th:inline="javascript">
+        const isAuthenticated = /*[[${#authentication.isAuthenticated()}]]*/ false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const topicContainer = document.querySelector('nav .max-w-7xl > div');
+            const followingLink = document.getElementById('following-link');
+            let allTopics = [];
+            let followedTopics = new Set();
+
+            // Fetch all topics
+            async function fetchAllTopics() {
+                try {
+                    const response = await fetch('/api/topics');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    allTopics = await response.json();
+                    renderTopics();
+                } catch (error) {
+                    console.error('Error fetching topics:', error);
+                }
+            }
+
+            // Fetch followed topics for the current user
+            async function fetchFollowedTopics() {
+                try {
+                    const response = await fetch('/api/topics/followed');
+                    if (response.ok) {
+                        const data = await response.json();
+                        followedTopics = new Set(data.map(topic => topic.id));
+                    } else if (response.status === 401) {
+                        console.log('User not authenticated, not fetching followed topics.');
+                        followedTopics = new Set(); // Ensure it's empty for non-authenticated users
+                    } else {
+                        console.error('Error fetching followed topics:', response.statusText);
+                    }
+                    renderTopics();
+                } catch (error) {
+                    console.error('Error fetching followed topics:', error);
+                }
+            }
+
+            // Render topics in the navigation bar
+            function renderTopics() {
+                // Clear existing dynamic topics (keep 'For you', 'Following', 'Featured')
+                let existingDynamicTopics = topicContainer.querySelectorAll('.dynamic-topic');
+                existingDynamicTopics.forEach(el => el.remove());
+
+                const staticLinks = new Set(['For you', 'Following', 'Featured']);
+
+                allTopics.forEach(topic => {
+                    if (!staticLinks.has(topic.name)) { // Avoid duplicating static links if topics have same names
+                        const isFollowing = followedTopics.has(topic.id);
+                        const topicElement = document.createElement('a');
+                        topicElement.href = '#'; // Or a specific topic page URL
+                        topicElement.textContent = topic.name;
+                        topicElement.className = `hover:text-gray-900 dynamic-topic ${isFollowing ? 'font-semibold text-gray-900 border-b-2 border-gray-900 pb-2' : ''}`;
+                        topicElement.dataset.topicId = topic.id;
+
+                        // Add click listener for follow/unfollow (if authenticated)
+                        topicElement.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            if (isAuthenticated) {
+                                const url = isFollowing ? `/api/topics/${topic.id}/unfollow` : `/api/topics/${topic.id}/follow`;
+                                try {
+                                    const response = await fetch(url, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({})
+                                    });
+                                    if (response.ok) {
+                                        console.log(`Successfully ${isFollowing ? 'unfollowed' : 'followed'} topic: ${topic.name}`);
+                                        // Re-fetch followed topics to update UI
+                                        fetchFollowedTopics();
+                                    } else {
+                                        console.error(`Failed to ${isFollowing ? 'unfollow' : 'follow'} topic:`, response.statusText);
+                                    }
+                                } catch (error) {
+                                    console.error('Error during follow/unfollow:', error);
+                                }
+                            } else {
+                                window.location.href = '/signin'; // Redirect to sign-in if not authenticated
+                            }
+                        });
+                        topicContainer.appendChild(topicElement);
+                    }
+                });
+            }
+
+            // Initial fetch
+            fetchAllTopics();
+            fetchFollowedTopics();
+        });
+    </script>
+</body>
+</html> 

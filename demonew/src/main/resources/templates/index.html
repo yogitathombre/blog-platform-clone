@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medium Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap'); /* For headline */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* For body text */
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .bg-medium-beige {
+            background-color: #F8F8F8; /* A light beige for the background */
+        }
+        .bg-medium-green {
+            background-color: #1A8917; /* Medium's signature green */
+        }
+    </style>
+</head>
+<body class="bg-medium-beige">
+    <div class="flex flex-col min-h-screen overflow-hidden">
+        <!-- Navigation -->
+        <nav class="bg-medium-beige border-b border-black">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-20 items-center">
+                    <div class="flex-shrink-0">
+                        <a href="/" class="text-4xl font-playfair font-bold text-black">Medium</a>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <a href="#" class="text-black text-sm hover:text-gray-700">Our story</a>
+                        <a href="#" class="text-black text-sm hover:text-gray-700">Membership</a>
+                        <a href="/signin" class="text-black text-sm hover:text-gray-700">Write</a>
+                        <a href="/signin" class="text-black text-sm hover:text-gray-700">Sign in</a>
+                        <a href="#" id="get-started-btn" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-800">Get started</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex-grow flex items-center">
+            <!-- Hero Section -->
+            <div class="relative overflow-hidden w-full">
+                <div class="max-w-7xl mx-auto py-12 px-4 sm:py-12 sm:px-6 lg:px-8 lg:flex lg:items-center lg:justify-between w-full">
+                    <div class="text-left z-10">
+                        <h1 class="text-6xl md:text-7xl lg:text-8xl font-playfair font-light text-black leading-tight">
+                            Human<br/>Stories & ideas
+                        </h1>
+                        <p class="mt-10 max-w-lg text-xl text-black font-roboto">
+                            A place to read, write, and deepen your understanding
+                        </p>
+                        <div class="mt-10">
+                            <a href="#" id="start-reading-btn" class="inline-block bg-black text-white px-8 py-3 rounded-full text-lg font-roboto hover:bg-gray-800">
+                                Start reading
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Background illustrations (placeholders - replace with actual images/SVGs) -->
+                    <div class="absolute inset-y-0 right-0 w-1/2 hidden lg:block">
+                        <!-- For a more accurate representation, replace the above divs with actual SVG or image tags, e.g.: -->
+                        <!-- <img src="/images/medium-flower.svg" alt="Flower illustration" class="absolute top-10 right-40 w-60 h-60"> -->
+                        <!-- <img src="/images/medium-hand.svg" alt="Hand illustration" class="absolute bottom-0 right-0 w-96 h-72"> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-medium-beige border-t border-gray-200">
+            <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap justify-center space-x-6 text-sm text-gray-600">
+                    <a href="#" class="hover:text-gray-900">Help</a>
+                    <a href="#" class="hover:text-gray-900">Status</a>
+                    <a href="#" class="hover:text-gray-900">About</a>
+                    <a href="#" class="hover:text-gray-900">Careers</a>
+                    <a href="#" class="hover:text-gray-900">Press</a>
+                    <a href="#" class="hover:text-gray-900">Blog</a>
+                    <a href="#" class="hover:text-gray-900">Privacy</a>
+                    <a href="#" class="hover:text-gray-900">Terms</a>
+                    <a href="#" class="hover:text-gray-900">Text to speech</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div th:insert="~{signup-modal :: signup-modal}"></div>
+
+    <script>
+        const signupModal = document.getElementById('signup-modal');
+        const closeButton = document.getElementById('close-modal');
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const startReadingBtn = document.getElementById('start-reading-btn');
+
+        function openModal() {
+            signupModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            signupModal.classList.add('hidden');
+        }
+
+        // Open modal when 'Get started' button is clicked
+        if (getStartedBtn) {
+            getStartedBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                openModal();
+            });
+        }
+
+        // Open modal when 'Start reading' button is clicked
+        if (startReadingBtn) {
+            startReadingBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                openModal();
+            });
+        }
+
+        // Close modal when the close button is clicked
+        if (closeButton) {
+            closeButton.addEventListener('click', closeModal);
+        }
+
+        // Close modal when clicking outside the modal content
+        if (signupModal) {
+            signupModal.addEventListener('click', function(event) {
+                if (event.target === signupModal) {
+                    closeModal();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

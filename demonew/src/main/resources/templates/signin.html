@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In to Medium</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v23.0&appId=2001686267034451"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .bg-medium-beige {
+            background-color: #F8F8F8;
+        }
+    </style>
+</head>
+<body class="bg-medium-beige flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md relative text-center">
+        <a href="/" class="absolute top-4 left-4 text-gray-500 hover:text-gray-700 text-2xl font-light">&times;</a>
+        <h2 class="text-2xl font-playfair font-bold text-gray-800 mb-6">Welcome back.</h2>
+        
+        <!-- Error message display -->
+        <div th:if="${param.error}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <span class="block sm:inline">Authentication failed. Please try again.</span>
+        </div>
+        
+        <div class="space-y-4 mb-6">
+            <button class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <img src="https://www.gstatic.com/images/branding/product/2x/google_g_logo_48dp.png" alt="Google logo" class="w-5 h-5 mr-3">
+                Sign in with Google
+            </button>
+            <button class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/1024px-2021_Facebook_icon.svg.png" alt="Facebook logo" class="w-5 h-5 mr-3">
+                Sign in with Facebook
+            </button>
+            <button class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <i class="fab fa-apple mr-3"></i>
+                Sign in with Apple
+            </button>
+            <button class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <i class="fab fa-twitter mr-3"></i>
+                Sign in with X
+            </button>
+        </div>
+
+        <p class="text-sm text-gray-600 mb-2">
+            No account? <a href="/signup-modal" class="text-green-600 hover:underline">Create one</a>
+        </p>
+        <p class="text-sm text-gray-600 mb-4">
+            Forgot email or trouble signing in? <a href="#" class="text-green-600 hover:underline">Get help.</a>
+        </p>
+
+        <p class="text-xs text-gray-500 mt-4 px-6 leading-relaxed">
+            Click "Sign in" to agree to Medium's <a href="#" class="text-gray-600 underline">Terms of Service</a> and acknowledge that Medium's <a href="#" class="text-gray-600 underline">Privacy Policy</a> applies to you.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show error message
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4';
+                errorDiv.innerHTML = `
+                    <span class="block sm:inline">${message}</span>
+                    <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+                        <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <title>Close</title>
+                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+                        </svg>
+                    </span>
+                `;
+                document.querySelector('.bg-white').insertBefore(errorDiv, document.querySelector('.space-y-4'));
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+
+            // Show loading state
+            function setLoading(button, isLoading) {
+                button.disabled = isLoading;
+                const originalText = button.innerHTML;
+                button.innerHTML = isLoading ? 
+                    '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>' : 
+                    originalText;
+            }
+
+            // Handle social sign in
+            async function handleSocialSignIn(provider) {
+                const button = document.querySelector(`button:has(${getProviderIcon(provider)})`);
+                setLoading(button, true);
+                try {
+                    if (provider === 'FACEBOOK') {
+                        window.location.href = '/oauth2/authorization/facebook';
+                    } else {
+                        showError(`${provider} sign in will be implemented soon`);
+                    }
+                } catch (error) {
+                    showError('An error occurred. Please try again.');
+                } finally {
+                    setLoading(button, false);
+                }
+            }
+
+            function getProviderIcon(provider) {
+                switch(provider) {
+                    case 'GOOGLE': return 'img[alt="Google logo"]';
+                    case 'FACEBOOK': return 'img[alt="Facebook logo"]';
+                    case 'APPLE': return 'i.fab.fa-apple';
+                    case 'X': return 'i.fab.fa-twitter';
+                    default: return '';
+                }
+            }
+
+            // Add click handlers for social buttons
+            document.querySelector('button:has(img[alt="Google logo"])').addEventListener('click', () => handleSocialSignIn('GOOGLE'));
+            document.querySelector('button:has(img[alt="Facebook logo"])').addEventListener('click', () => handleSocialSignIn('FACEBOOK'));
+            document.querySelector('button:has(i.fab.fa-apple)').addEventListener('click', () => handleSocialSignIn('APPLE'));
+            document.querySelector('button:has(i.fab.fa-twitter)').addEventListener('click', () => handleSocialSignIn('X'));
+        });
+    </script>
+</body>
+</html> 

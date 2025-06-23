@@ -1,0 +1,67 @@
+<div id="signup-modal" th:fragment="signup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md relative">
+        <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-light">&times;</button>
+        <h2 class="text-center text-2xl font-playfair font-bold text-gray-800 mb-6">Join Medium.</h2>
+        
+        <div class="space-y-4">
+            <button class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <img src="https://www.gstatic.com/images/branding/product/2x/google_g_logo_48dp.png" alt="Google logo" class="w-5 h-5 mr-3">
+                Sign up with Google
+            </button>
+            <a href="/oauth2/authorization/facebook" class="block" id="facebook-signup">
+                <button type="button" class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/1024px-2021_Facebook_icon.svg.png" alt="Facebook logo" class="w-5 h-5 mr-3">
+                    Sign up with Facebook
+                </button>
+            </a>
+            <a href="/signup/email" class="flex items-center justify-center w-full border border-gray-300 rounded-full py-3 text-gray-700 hover:bg-gray-100">
+                <i class="fas fa-envelope mr-3"></i>
+                Sign up with email
+            </a>
+        </div>
+
+        <p class="text-center text-sm text-gray-600 mt-6">
+            Already have an account? <a href="/login" class="text-green-600 hover:underline">Sign in</a>
+        </p>
+
+        <p class="text-center text-xs text-gray-500 mt-4 px-6 leading-relaxed">
+            Click "Sign up" to agree to Medium's <a href="#" class="text-gray-600 underline">Terms of Service</a> and acknowledge that Medium's <a href="#" class="text-gray-600 underline">Privacy Policy</a> applies to you.
+        </p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('signup-modal');
+        const closeButton = document.getElementById('close-modal');
+        const facebookSignup = document.getElementById('facebook-signup');
+        
+        // Show modal by default
+        modal.classList.remove('hidden');
+        
+        // Close modal when clicking the close button
+        closeButton.addEventListener('click', function() {
+            window.location.href = '/';
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                window.location.href = '/';
+            }
+        });
+
+        // Handle Facebook signup
+        facebookSignup.addEventListener('click', function(e) {
+            e.preventDefault();
+            const facebookWindow = window.open('/oauth2/authorization/facebook', 'facebook-signup', 
+                'width=600,height=600,left=300,top=200');
+            
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.success) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    });
+</script> 
